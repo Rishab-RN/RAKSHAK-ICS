@@ -1,0 +1,4 @@
+# Place SWaT dataset CSV files here.
+# Download from: https://itrust.sutd.edu.sg/itrust-labs_datasets/dataset_info/
+# Expected files: SWaT_Dataset_Normal_v1.xlsx, SWaT_Dataset_Attack_v0.xlsx
+# These files are excluded from git via .gitignore

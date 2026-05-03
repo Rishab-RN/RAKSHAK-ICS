@@ -1,0 +1,4 @@
+# Place HAI (HIL-based Augmented ICS) dataset CSV files here.
+# Download from: https://github.com/icsdataset/hai
+# 86 sensor channels, steam turbine + boiler process
+# Used for cross-domain evaluation (no retraining)

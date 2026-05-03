@@ -1,0 +1,76 @@
+# =============================================================================
+# RAKSHAK-ICS v4 .gitignore
+# =============================================================================
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
+
+# --- Virtual Environment ---
+venv/
+env/
+.venv/
+.env/
+
+# --- Jupyter Notebooks ---
+.ipynb_checkpoints/
+*.ipynb_meta
+
+# --- IDE / Editor ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- Large Data Files ---
+data/swat/*.csv
+data/swat/*.xlsx
+data/hai/*.csv
+data/hai/*.xlsx
+data/proof/*.pt
+data/proof/*.npy
+data/proof/*.pkl
+data/proof/*.parquet
+*.h5
+*.hdf5
+
+# --- Model Weights & Checkpoints ---
+models/**/*.pt
+models/**/*.pth
+models/**/*.onnx
+models/**/*.ckpt
+models/**/*.zip
+
+# --- Training Logs ---
+results/logs/
+runs/
+tb_logs/
+lightning_logs/
+*.log
+
+# --- TensorBoard ---
+*.tfevents.*
+
+# --- Dashboard Frontend ---
+dashboard/frontend/node_modules/
+dashboard/frontend/dist/
+dashboard/frontend/.env
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# --- Archives ---
+*.zip
+*.tar.gz
+*.7z
+*.rar
