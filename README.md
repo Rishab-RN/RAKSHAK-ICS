@@ -22,7 +22,6 @@
 - [Results](#-results)
 - [AIML Curriculum Mapping](#-aiml-curriculum-mapping)
 - [References](#-references)
-- [Author](#-author)
 
 ---
 
@@ -46,34 +45,34 @@ The adversarial loop forces the Blue Agent to become robust against attacks it h
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                      RAKSHAK-ICS v4 — AIML Complete                    │
+│                      RAKSHAK-ICS v4 — AIML Complete                     │
 ├─────────────────────────────────────────────────────────────────────────┤
 │  DATA LAYER                                                             │
-│  SWaT CSV (51 sensors, 500K rows) → Normalise → Sliding Windows (60×51)│
-│  HAI  CSV (86 channels) → Same scaler (cross-domain, no refit)         │
+│  SWaT CSV (51 sensors, 500K rows) → Normalise → Sliding Windows (60×51) │
+│  HAI  CSV (86 channels) → Same scaler (cross-domain, no refit)          │
 ├─────────────────────────────────────────────────────────────────────────┤
 │  AI SEARCH LAYER                                                        │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────────┐              │
-│  │ Random   │ │ IDDFS    │ │ A*Search │ │ AlphaBeta    │              │
-│  │ (BFS)    │ │ depth-lim│ │ h=disrup.│ │ depth=3      │              │
-│  └──────────┘ └──────────┘ └──────────┘ └──────────────┘              │
-│  GA Optimiser: evolves {λ1,λ2,λ3} reward weights                      │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────────┐                │
+│  │ Random   │ │ IDDFS    │ │ A*Search │ │ AlphaBeta    │                │
+│  │ (BFS)    │ │ depth-lim│ │ h=disrup.│ │ depth=3      │                │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────────┘                │
+│  GA Optimiser: evolves {λ1,λ2,λ3} reward weights                        │
 ├─────────────────────────────────────────────────────────────────────────┤
 │  BLUE AGENT (trained first, then FROZEN)                                │
-│  Stream 1: LSTM-AE              Stream 2: GraphSAGE GNN               │
-│  Enc(51→64→32→16)→z             51 nodes, Pearson≥0.7 edges           │
-│  Dec(16→32→64→51)               SAGEConv(2 layers, dim=32)            │
-│  └── lstm_score ────────────────── └── gnn_score ──────┐              │
-│                    FUSION: α×lstm + (1-α)×gnn > τ → ANOMALY           │
-├──────────────── FREEZE BLUE ───────────────────────────────────────────┤
+│  Stream 1: LSTM-AE              Stream 2: GraphSAGE GNN                 │
+│  Enc(51→64→32→16)→z             51 nodes, Pearson≥0.7 edges             │
+│  Dec(16→32→64→51)               SAGEConv(2 layers, dim=32)              │
+│  └── lstm_score ────────────────── └── gnn_score ──────┐                │
+│                    FUSION: α×lstm + (1-α)×gnn > τ → ANOMALY             │
+├──────────────── FREEZE BLUE  ───────────────────────────────────────────┤
 │  DQN RED AGENT                                                          │
-│  State(58) → DQN → Action(255)                                         │
-│  Reward: λ1×|δ| − λ2×detected − λ3×|δ| (GA-optimised λ)              │
+│  State(58) → DQN → Action(255)                                          │
+│  Reward: λ1×|δ| − λ2×detected − λ3×|δ| (GA-optimised λ)                 │
 ├─────────────────────────────────────────────────────────────────────────┤
-│  EVALUATION: ML Baselines | AI Baselines | Ablation | Cross-domain     │
+│  EVALUATION: ML Baselines | AI Baselines | Ablation | Cross-domain      │
 ├─────────────────────────────────────────────────────────────────────────┤
-│  DASHBOARD: React (Vercel) ←WebSocket→ FastAPI (HuggingFace Docker)    │
-│  Mode 1: Normal | Mode 2: SWaT Attack | Mode 3: DQN Red Agent         │
+│  DASHBOARD: React (Vercel) ←WebSocket→ FastAPI (HuggingFace Docker)     │
+│  Mode 1: Normal | Mode 2: SWaT Attack | Mode 3: DQN Red Agent           │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -387,13 +386,3 @@ npm run dev
 
 ---
 
-## 👤 Author
-
-**Rishab Nayak**
-B.E. CSE (AI & ML) — RV College of Engineering, Bengaluru
-
----
-
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE).
