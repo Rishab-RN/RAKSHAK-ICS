@@ -622,6 +622,130 @@ def save_dataset_stats(
 
 
 # ══════════════════════════════════════════════════════════════════════
+#  Save / Load Processed Data
+# ══════════════════════════════════════════════════════════════════════
+
+def save_processed_data(
+    results: Dict[str, object],
+    output_dir: str = "data/proof/",
+) -> str:
+    """Save all processed tensors and metadata to disk.
+
+    Saves:
+      - X_train.npy, X_val.npy, X_test.npy            (sliding windows)
+      - node_features_train.npy, ..._val.npy, ..._test.npy
+      - edge_index.npy, edge_weights.npy               (graph)
+      - feature_names.json, column_categories.json      (metadata)
+      - scaler.pkl                                      (fitted scaler)
+
+    All files are derived from NDA-protected raw data, so they should
+    remain gitignored. Only dataset_stats.json is safe to commit.
+
+    Args:
+        results: Dict returned by SWaTPreprocessor.run().
+        output_dir: Directory to save processed files.
+
+    Returns:
+        Path to the output directory.
+    """
+    import pickle
+
+    out = Path(output_dir)
+    out.mkdir(parents=True, exist_ok=True)
+
+    # ── Numpy arrays ──────────────────────────────────────────────────
+    for key in ["X_train", "X_val", "X_test",
+                "node_features_train", "node_features_val", "node_features_test",
+                "edge_index", "edge_weights"]:
+        if key in results and results[key] is not None:
+            fpath = out / f"{key}.npy"
+            np.save(fpath, results[key])
+            logger.info(f"Saved {key}: {results[key].shape} → {fpath}")
+
+    # ── Scaler ────────────────────────────────────────────────────────
+    if "scaler" in results and results["scaler"] is not None:
+        scaler_path = out / "scaler.pkl"
+        with open(scaler_path, "wb") as f:
+            pickle.dump(results["scaler"], f)
+        logger.info(f"Saved scaler → {scaler_path}")
+
+    # ── Metadata (JSON-safe) ──────────────────────────────────────────
+    if "feature_names" in results:
+        with open(out / "feature_names.json", "w") as f:
+            json.dump(results["feature_names"], f, indent=2)
+        logger.info(f"Saved feature_names ({len(results['feature_names'])} features)")
+
+    if "column_categories" in results:
+        with open(out / "column_categories.json", "w") as f:
+            json.dump(results["column_categories"], f, indent=2)
+        logger.info(f"Saved column_categories")
+
+    logger.info(f"All processed data saved to {out}/")
+    return str(out)
+
+
+def load_processed_data(
+    data_dir: str = "data/proof/",
+) -> Dict[str, object]:
+    """Load previously saved processed data from disk.
+
+    This allows downstream modules (LSTM-AE, GAT, baselines) to
+    skip the full preprocessing pipeline and load ready-to-use tensors.
+
+    Args:
+        data_dir: Directory containing saved .npy files.
+
+    Returns:
+        Dict with same keys as SWaTPreprocessor.run() output.
+
+    Raises:
+        FileNotFoundError: If required files are missing.
+    """
+    import pickle
+
+    d = Path(data_dir)
+    if not d.exists():
+        raise FileNotFoundError(
+            f"Processed data directory not found: {d}. "
+            f"Run preprocessing first: python -m src.preprocess --save"
+        )
+
+    results = {}
+
+    # ── Numpy arrays ──────────────────────────────────────────────────
+    for key in ["X_train", "X_val", "X_test",
+                "node_features_train", "node_features_val", "node_features_test",
+                "edge_index", "edge_weights"]:
+        fpath = d / f"{key}.npy"
+        if fpath.exists():
+            results[key] = np.load(fpath)
+            logger.info(f"Loaded {key}: {results[key].shape}")
+        else:
+            logger.warning(f"Missing {fpath}")
+
+    # ── Scaler ────────────────────────────────────────────────────────
+    scaler_path = d / "scaler.pkl"
+    if scaler_path.exists():
+        with open(scaler_path, "rb") as f:
+            results["scaler"] = pickle.load(f)
+        logger.info(f"Loaded scaler: {type(results['scaler']).__name__}")
+
+    # ── Metadata ──────────────────────────────────────────────────────
+    fn_path = d / "feature_names.json"
+    if fn_path.exists():
+        with open(fn_path, "r") as f:
+            results["feature_names"] = json.load(f)
+        logger.info(f"Loaded feature_names ({len(results['feature_names'])})")
+
+    cc_path = d / "column_categories.json"
+    if cc_path.exists():
+        with open(cc_path, "r") as f:
+            results["column_categories"] = json.load(f)
+
+    return results
+
+
+# ══════════════════════════════════════════════════════════════════════
 #  Main Pipeline Class
 # ══════════════════════════════════════════════════════════════════════
 
@@ -863,6 +987,10 @@ if __name__ == "__main__":
         "--no-stats", action="store_true",
         help="Skip saving dataset statistics",
     )
+    parser.add_argument(
+        "--save", action="store_true",
+        help="Save processed tensors (.npy), scaler (.pkl), and metadata to data/proof/",
+    )
     args = parser.parse_args()
 
     preprocessor = SWaTPreprocessor(args.config)
@@ -871,6 +999,11 @@ if __name__ == "__main__":
         preprocessor.config["data"]["raw_dir"] = args.data_dir
 
     results = preprocessor.run(save_stats=not args.no_stats)
+
+    # Save processed data to disk if requested
+    if args.save:
+        proof_dir = preprocessor.config["data"].get("proof_dir", "data/proof/")
+        save_processed_data(results, proof_dir)
 
     print(f"\n{'='*50}")
     print(f"Preprocessing complete!")
@@ -883,4 +1016,6 @@ if __name__ == "__main__":
     print(f"  Features:          {len(results['feature_names'])}")
     print(f"  Feature names:     {results['feature_names'][:5]}...")
     print(f"  Scaler type:       {type(results['scaler']).__name__}")
+    if args.save:
+        print(f"  Saved to:          {proof_dir}")
     print(f"{'='*50}")
