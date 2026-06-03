@@ -1,5 +1,5 @@
 # =============================================================================
-# RAKSHAK-ICS v4 .gitignore
+# RAKSHAK-ICS .gitignore
 # =============================================================================
 
 # --- Python ---
@@ -30,15 +30,23 @@ env/
 *.swo
 *~
 
-# --- Large Data Files ---
-data/swat/*.csv
-data/swat/*.xlsx
-data/hai/*.csv
-data/hai/*.xlsx
-data/proof/*.pt
-data/proof/*.npy
-data/proof/*.pkl
-data/proof/*.parquet
+# --- Large Data Files & Datasets (NDA-protected) ---
+# NEVER commit raw data — SWaT dataset is under NDA
+data/swat/*
+!data/swat/.gitkeep
+data/hai/*
+!data/hai/.gitkeep
+data/proof/*
+!data/proof/.gitkeep
+!data/proof/dataset_stats.json
+
+# Block ALL raw data formats anywhere in repo
+*.csv
+*.xlsx
+*.xls
+data/**/*.npy
+data/**/*.pt
+data/**/*.pkl
 *.h5
 *.hdf5
 
@@ -48,12 +56,14 @@ models/**/*.pth
 models/**/*.onnx
 models/**/*.ckpt
 models/**/*.zip
+models/**/*.pkl
 
 # --- Training Logs ---
 results/logs/
 runs/
 tb_logs/
 lightning_logs/
+wandb/
 *.log
 
 # --- TensorBoard ---
@@ -74,3 +84,9 @@ Desktop.ini
 *.tar.gz
 *.7z
 *.rar
+
+# --- Generated PDFs (keep in plans/) ---
+system_design.pdf
+
+# --- External repos ---
+external/
