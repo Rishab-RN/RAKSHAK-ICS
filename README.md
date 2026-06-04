@@ -314,15 +314,17 @@ npm run dev
 - [x] Sensor correlation graph: 65 nodes, 436 edges
 - [x] 5-dim node features: [mean, std, min, max, range]
 - [x] `data/proof/dataset_stats.json` — privacy-safe stats
-- [ ] `01_eda.ipynb` — 6 dark-themed visualizations
-- [ ] `02_preprocessing.ipynb` — pipeline validation notebook
+- [x] `01_eda.ipynb` — 12-section dark-themed EDA (27 cells)
+- [x] `02_preprocessing.ipynb` — pipeline validation notebook (25 cells)
+- [x] HAI dataset downloaded (train1 + test1, 259K rows)
+- [x] Cleaned CSVs + .npy tensors saved to `data/proof/`
 
-### Week 3 — All Baselines
-- [ ] `src/baselines.py` — 6 ML models + XGBoost, `run_with_seeds()` results
-- [ ] `src/ai_search.py` — 4 attackers + GA (placeholder Blue Agent)
-- [ ] `03_ml_baselines.ipynb` — all results as mean±std
-- [ ] `03b_ai_baselines.ipynb` — attacker evaluation framework
-- [ ] `03c_dl_baselines.ipynb` — Anomaly Transformer + USAD
+### Week 3 — All Baselines ✅
+- [x] `src/baselines.py` — 7 ML models (DT, RF, KNN, NB, IsoForest, K-Means, XGBoost)
+- [x] `src/ai_search.py` — 4 attackers (Random, IDDFS, A*, AlphaBeta) + GA optimizer
+- [x] `03_ml_baselines.ipynb` — 5-seed evaluation, F1 bar chart, radar, timing
+- [x] `03b_ai_baselines.ipynb` — attacker evasion/disruption comparison + GA demo
+- [x] `03c_dl_baselines.ipynb` — USAD + Anomaly Transformer from scratch
 
 ### Week 4 — LSTM Autoencoder
 - [ ] `src/lstm_ae.py` — full implementation
