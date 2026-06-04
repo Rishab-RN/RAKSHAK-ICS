@@ -648,6 +648,8 @@ def run_all_attackers(
             episode_indices = rng.choice(len(sensor_data), size=n_samples, replace=True)
 
             for idx in episode_indices:
+                if hasattr(blue_agent_fn, "set_context"):
+                    blue_agent_fn.set_context(idx)
                 result = attacker.attack(sensor_data[idx], seed=seed)
                 evasions.append(1 if result.get("evasion", False) else 0)
                 disruptions.append(result.get("disruption", 0.0))

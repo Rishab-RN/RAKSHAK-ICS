@@ -581,17 +581,23 @@ def _train_with_injection(
     seed: int,
 ) -> Tuple[BaselineModel, np.ndarray, np.ndarray]:
     """Train helper that injects synthetic anomalies."""
-    # For supervised models: inject anomalies into training data
     model = get_model(model_name)
+
+    # Downsample training data to 20% for speed while maintaining statistical representation
+    rng = np.random.RandomState(seed)
 
     if model.model_type == "supervised":
         X_train_aug, y_train = inject_synthetic_anomalies(
             X_train_flat, anomaly_fraction, seed=seed
         )
-        model.fit(X_train_aug, y_train)
+        n_samples = len(X_train_aug)
+        indices = rng.choice(n_samples, size=int(n_samples * 0.20), replace=False)
+        model.fit(X_train_aug[indices], y_train[indices])
     else:
         # Unsupervised: train on clean data only
-        model.fit(X_train_flat)
+        n_samples = len(X_train_flat)
+        indices = rng.choice(n_samples, size=int(n_samples * 0.20), replace=False)
+        model.fit(X_train_flat[indices])
 
     # Generate test labels with same seed for consistency
     _, y_test = inject_synthetic_anomalies(
