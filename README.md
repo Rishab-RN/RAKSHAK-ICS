@@ -4,7 +4,6 @@
 
 [![Python 3.10](https://img.shields.io/badge/Python-3.10-blue.svg)](https://python.org)
 [![PyTorch 2.1](https://img.shields.io/badge/PyTorch-2.1-ee4c2c.svg)](https://pytorch.org)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ---
 
@@ -57,35 +56,35 @@ The adversarial loop forces the Blue Agent to become robust against attacks it h
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│ RAKSHAK-ICS                                                           │
+│ RAKSHAK-ICS                                                             │
 ├─────────────────────────────────────────────────────────────────────────┤
-│ DATA LAYER                                                            │
-│ SWaT A9 (65 features, 87K rows) → MinMaxScale → Sliding Windows(60×65)│
-│ HAI (86 channels) → Same scaler (cross-domain, no refit)              │
+│ DATA LAYER                                                              │
+│ SWaT A9 (65 features, 87K rows) → MinMaxScale → Sliding Windows(60×65)  │
+│ HAI (86 channels) → Same scaler (cross-domain, no refit)                │
 ├─────────────────────────────────────────────────────────────────────────┤
-│ AI SEARCH LAYER (Unit I–II)                                           │
-│ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────────┐              │
-│ │ Random   │ │ IDDFS    │ │ A*Search │ │ AlphaBeta    │              │
-│ │ (BFS)    │ │ depth-lim│ │ h=disrup.│ │ depth=3      │              │
-│ └──────────┘ └──────────┘ └──────────┘ └──────────────┘              │
-│ GA Optimiser: evolves {λ1,λ2,λ3} reward weights                      │
+│ AI SEARCH LAYER (Unit I–II)                                             │
+│ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────────┐                 │
+│ │ Random   │ │ IDDFS    │ │ A*Search │ │ AlphaBeta    │                 │
+│ │ (BFS)    │ │ depth-lim│ │ h=disrup.│ │ depth=3      │                 │
+│ └──────────┘ └──────────┘ └──────────┘ └──────────────┘                 │
+│ GA Optimiser: evolves {λ1,λ2,λ3} reward weights                         │
 ├─────────────────────────────────────────────────────────────────────────┤
-│ BLUE AGENT (trained first, then FROZEN)                               │
-│ Stream 1: LSTM-AE            Stream 2: GAT GNN                       │
-│ Enc(65→64→32→16)→z           65 nodes, Pearson≥0.7 → 436 edges       │
-│ Dec(16→32→64→65)             GATConv(5→16, heads=8) × 2 layers       │
-│ └── lstm_score ─────────────── └── gnn_score ──────┐                  │
-│                FUSION: α×lstm + (1-α)×gnn > τ → ANOMALY              │
-├──────────────── FREEZE BLUE ───────────────────────────────────────────┤
-│ DQN RED AGENT (Multi-Sensor)                                          │
-│ State(60) → DQN [256,256] → MultiDiscrete([51,5,52,5])               │
-│ Reward: λ1×Σ|δᵢ| − λ2×detected − λ3×(Σ|δᵢ|)² (quadratic stealth)   │
+│ BLUE AGENT (trained first, then FROZEN)                                 │
+│ Stream 1: LSTM-AE            Stream 2: GAT GNN                          │
+│ Enc(65→64→32→16)→z           65 nodes, Pearson≥0.7 → 436 edges          │
+│ Dec(16→32→64→65)             GATConv(5→16, heads=8) × 2 layers          │
+│ └── lstm_score ─────────────── └── gnn_score ──────┐                    │
+│                FUSION: α×lstm + (1-α)×gnn > τ → ANOMALY                 │
+├────────────────       FREEZE BLUE       ────────────────────────────────┤
+│ DQN RED AGENT (Multi-Sensor)                                            │
+│ State(60) → DQN [256,256] → MultiDiscrete([51,5,52,5])                  │ 
+│ Reward: λ1×Σ|δᵢ| − λ2×detected − λ3×(Σ|δᵢ|)² (quadratic stealth)        │
 ├─────────────────────────────────────────────────────────────────────────┤
-│ EVALUATION: ML Baselines | DL Baselines | Ablation | Cross-domain    │
-│             All results: mean±std (5 seeds), paired t-test p<0.001   │
+│ EVALUATION: ML Baselines | DL Baselines | Ablation | Cross-domain       │
+│             All results: mean±std (5 seeds), paired t-test p<0.001      │
 ├─────────────────────────────────────────────────────────────────────────┤
-│ DASHBOARD: React (Vercel) ←WebSocket 10Hz→ FastAPI (HuggingFace)     │
-│ Mode 1: Normal | Mode 2: SWaT Attack | Mode 3: DQN Red Agent         │
+│ DASHBOARD: React (Vercel) ←WebSocket 10Hz→ FastAPI (HuggingFace)        │
+│ Mode 1: Normal | Mode 2: SWaT Attack | Mode 3: DQN Red Agent            │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
