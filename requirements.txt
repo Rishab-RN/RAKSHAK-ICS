@@ -1,6 +1,4 @@
-# =============================================================================
-# RAKSHAK-ICS v4 — Python 3.10 | CUDA 11.8
-# =============================================================================
+# RAKSHAK-ICS — Python 3.10 | CUDA 11.8
 
 # --- Core Scientific Computing ---
 numpy==1.24.4
@@ -13,7 +11,7 @@ torch==2.1.2
 torchvision==0.16.2
 torchaudio==2.1.2
 
-# --- Graph Neural Networks (GraphSAGE) ---
+# --- Graph Neural Networks (GAT) ---
 torch-geometric==2.4.0
 torch-scatter==2.1.2
 torch-sparse==0.6.18
@@ -22,8 +20,8 @@ torch-sparse==0.6.18
 stable-baselines3[extra]==2.2.1
 gymnasium==0.29.1
 
-# --- AI Search / Genetic Algorithm ---
-# No extra deps — implemented in pure Python + NumPy
+# --- Ensemble / Boosting ---
+xgboost==2.0.3
 
 # --- Visualization ---
 matplotlib==3.8.2
@@ -32,6 +30,7 @@ plotly==5.18.0
 
 # --- Experiment Tracking ---
 tensorboard==2.15.1
+wandb==0.16.1
 
 # --- Utilities ---
 networkx==3.2.1

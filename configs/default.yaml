@@ -1,0 +1,121 @@
+# RAKSHAK-ICS Configuration
+
+data:
+  nda_notice: "SWaT dataset is under NDA. Do NOT commit raw data to git."
+  raw_dir: "data/swat/"
+  hai_dir: "data/hai/"
+  proof_dir: "data/proof/"
+  train_files:
+    - "dataset1.csv"
+    - "dataset2.csv"
+  test_files:
+    - "dataset3.csv"
+  timestamp_col: "t_stamp"
+  timestamp_format: "%d-%b-%Y %H:%M:%S"
+  bad_input_value: "Bad Input"
+
+preprocessing:
+  window_size: 60
+  stride: 1
+  train_ratio: 0.7
+  val_ratio: 0.15
+  test_ratio: 0.15
+  correlation_threshold: 0.7
+  scaler: "minmax"  # minmax | standard
+  remove_constant_cols: true
+  handle_missing: "ffill"  # ffill | drop | interpolate
+
+lstm_ae:
+  input_dim: 65  # number of sensor features (after preprocessing — SWaT A9)
+  encoder_hidden: 64
+  latent_dim: 32
+  bottleneck_dim: 16
+  num_layers: 2
+  dropout: 0.1
+  learning_rate: 0.001
+  batch_size: 256
+  epochs: 50
+  patience: 10  # early stopping
+  threshold_percentile: 95
+  scheduler:
+    type: "reduce_on_plateau"
+    factor: 0.5
+    patience: 5
+
+gat:
+  node_feature_dim: 5  # [mean, std, min, max, range]
+  hidden_dim: 16
+  num_heads: 8
+  num_layers: 2
+  edge_dim: 1  # correlation weight
+  dropout: 0.1
+  learning_rate: 0.001
+  batch_size: 128
+  epochs: 100
+  patience: 15
+
+fusion:
+  alpha_range: [0.0, 1.0]
+  alpha_step: 0.05
+  threshold_method: "f1_optimal"  # f1_optimal | percentile
+
+dqn:
+  learning_rate: 0.0001
+  buffer_size: 100000
+  batch_size: 128
+  gamma: 0.99
+  exploration_fraction: 0.4
+  exploration_final_eps: 0.05
+  target_update_interval: 1000
+  total_timesteps: 100000
+  episode_length: 200
+  consecutive_detection_limit: 10
+  net_arch: [256, 256]
+
+rl_env:
+  state_dim: 60  # 51 sensors + det_flag + process_dev + 5*rolling_errors + 2*last_attacked
+  action_space: "multi_discrete"  # multi_discrete | discrete
+  multi_discrete_dims: [51, 5, 52, 5]  # sensor1, mag1, sensor2, mag2
+  discrete_size: 255  # fallback: 51 sensors * 5 magnitudes
+  reward_weights:
+    lambda1: 1.0   # disruption reward
+    lambda2: 10.0  # detection penalty
+    lambda3: 0.5   # stealth penalty (quadratic)
+
+ga_optimizer:
+  population_size: 20
+  generations: 50
+  tournament_size: 3
+  crossover: "blx_alpha"  # blx_alpha | uniform
+  mutation_std: 0.1
+  elite_fraction: 0.1
+
+evaluation:
+  seeds: [42, 123, 456, 789, 1024]
+  significance_level: 0.001
+  metrics:
+    - "f1"
+    - "precision"
+    - "recall"
+    - "auc_roc"
+
+baselines:
+  models:
+    - "decision_tree"
+    - "random_forest"
+    - "knn"
+    - "naive_bayes"
+    - "isolation_forest"
+    - "kmeans"
+  xgboost:
+    n_estimators: 200
+    max_depth: 6
+    learning_rate: 0.1
+    use_gpu: false
+
+paths:
+  models_dir: "models/"
+  results_dir: "results/"
+  figures_dir: "results/figures/"
+  tables_dir: "results/tables/"
+  logs_dir: "results/logs/"
