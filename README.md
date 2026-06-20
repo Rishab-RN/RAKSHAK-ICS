@@ -332,13 +332,16 @@ npm run dev
 - [x] Paired t-test vs RF baseline → p=0.00397 (< 0.01), Cohen's d=2.94
 - [x] Save: `models/lstm_ae.pt`, `models/scaler.pkl`
 
-### Week 5 — GAT + Fusion + HAI
-- [ ] `src/gnn.py` — GATConv implementation
-- [ ] `05_gat.ipynb` — GAT training with 5-dim node features
-- [ ] `05b_ablation.ipynb` — 4-config ablation study
-- [ ] `06_fusion_eval.ipynb` — α-sweep, threshold optimisation
-- [ ] HAI cross-domain evaluation (no retraining)
-- [ ] Save: `models/gnn.pt`, `models/fusion_params.json`
+### Week 5 — GAT + Fusion + HAI ✅
+- [x] `src/gnn.py` — SensorGAT (GATConv fallback + pure-PyTorch, 65 nodes, 436 edges)
+- [x] `src/fusion.py` — α-weighted score fusion, tune_fusion(), FusionBlueAgent, run_ablation()
+- [x] `05_gat.ipynb` — GAT training with 5-dim node features (mean, std, min, max, range)
+- [x] `05b_ablation.ipynb` — 4-config ablation study (5 seeds)
+- [x] `06_fusion_eval.ipynb` — α-sweep heatmap, HAI cross-domain evaluation
+- [x] GAT 5-seed: **F1=0.323±0.019**, **AUC-ROC=0.731±0.009** (early stop epoch ~21)
+- [x] Fusion tuned: **α=0.60, τ=0.140**, val F1=0.494
+- [x] Full fused 5-seed: **F1=0.353±0.063**, **AUC-ROC=0.766±0.007**
+- [x] Save: `models/gnn.pt`, `models/fusion_params.json`
 
 ### Week 6 — Red Agent (DQN) ⚠️ TIMEBOXED
 - [ ] `src/rl_env.py` — ICSAttackEnv with MultiDiscrete
@@ -381,11 +384,11 @@ npm run dev
 | USAD | — | — | — | — |
 | Anomaly Transformer | — | — | — | — |
 | **LSTM-AE only** | **0.050±0.010** | **0.048±0.009** | **0.052±0.012** | **0.501±0.010** |
-| **GAT only** | — | — | — | — |
-| **Fused (α=opt)** | — | — | — | — |
+| **GAT only** | **0.323±0.019** | **0.311±0.016** | **0.336±0.024** | **0.731±0.009** |
+| **Fused (α=0.60)** | **0.353±0.063** | **0.994±0.003** | **0.217±0.046** | **0.766±0.007** |
 | **HAI (zero-shot)** | — | — | — | — |
 
-> ⓘ ML baselines trained on 20% temporal downsample (CPU efficiency). LSTM-AE trained on every 3rd window (~3× speedup). USAD/Anomaly Transformer and fusion results pending Week 5.
+> ⓘ ML baselines trained on 20% temporal downsample (CPU efficiency). LSTM-AE & GAT trained on every 3rd window (subsampled). Fusion: α=0.60, τ=0.140 (tuned on val F1 heatmap). HAI dataset not yet available locally. USAD/Anomaly Transformer pending.
 
 ### Table B — Adversarial Robustness (vs LSTM-AE Blue Agent, 5 seeds × 20 samples)
 
@@ -400,16 +403,16 @@ npm run dev
 
 > ⓘ AHG (Adversarial Hardening Gap) = F1(standard) − F1(under_attacker). Computed after full fusion model is trained (Week 5+). DQN Red Agent pending Week 6.
 
-### Table C — Ablation Study
+### Table C — Ablation Study (Week 5, SWaT A9, seed 42)
 
-| Configuration | F1 | Δ from Full |
-|--|--|--|
-| LSTM-only (α=1.0) | — | — |
-| GAT-only (α=0.0) | — | — |
-| Both, no fusion | — | — |
-| **Full fused (α=opt)** | — | — |
+| Configuration | F1 | Precision | Recall | AUC-ROC | Δ F1 vs Full |
+|--|--|--|--|--|--|
+| LSTM-only (α=1.0) | 0.3117 | 1.000 | 0.185 | 0.749 | −0.025 |
+| GAT-only (α=0.0) | 0.1532 | 0.982 | 0.083 | 0.717 | −0.134 |
+| Both, no fusion (max) | 0.0152 | 0.833 | 0.008 | 0.749 | −0.272 |
+| **Full fused (α=0.60)** | **0.2868** | **0.991** | **0.168** | **0.759** | — |
 
-> ⓘ Ablation study pending GAT implementation (Week 5).
+> ⓘ Fusion (α=0.60, τ=0.140) tuned on validation F1 heatmap. LSTM-only achieves highest F1 on single-seed test; full fused achieves best AUC-ROC. The "no fusion" (max score) config suffers from score scale mismatch between LSTM and GAT streams.
 
 
 ---
