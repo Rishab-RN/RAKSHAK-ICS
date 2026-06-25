@@ -225,7 +225,7 @@ def run_full_adversarial_evaluation(config_path: str = "configs/default.yaml") -
 \end{tabular}
 \end{table}
 """
-    with open(tables_dir / "adversarial_eval_table.tex", "w") as f:
+    with open(tables_dir / "adversarial_eval_table.tex", "w", encoding="utf-8") as f:
         f.write(latex_str)
         
     # 5. Generate plots from evaluations.npz
